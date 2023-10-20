@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 176
+exclude =
+    ./docs/
+    ./tests/
+    ./.venv*/
+    .git
+
