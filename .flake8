@@ -6,3 +6,10 @@ exclude =
     ./.venv*/
     .git
 
+per-file-ignores =
+    */__init__.py: F401
+    # Init versions for alembic
+    migrations/alembic/versions/*: W291
+    # FastAPI dependencies
+    backend/routers/*: B008
+    backend/dependencies/*: B008

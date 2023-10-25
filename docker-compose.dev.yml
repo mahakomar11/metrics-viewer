@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+  database:
+    container_name: metrics_database
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - metrics
+    volumes:
+      - ./raw_data:/raw_data
+    command: postgres -p ${POSTGRES_PORT} -c 'shared_buffers=128MB' -c 'max_connections=200'
+
+  migrations:
+    container_name: metrics_migrations
+    restart: on-failure:3
+    build:
+      context: .
+      dockerfile: migrations/Dockerfile
+    env_file:
+      - .env-dev
+    environment:
+      POSTGRES_HOST: metrics_database
+    command: alembic upgrade head
+    depends_on:
+      - database
+    networks:
+      - metrics
+
+  api:
+    container_name: metrics_api
+    restart: always
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env-dev
+    environment:
+      POSTGRES_HOST: metrics_database
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    command: gunicorn -k uvicorn.workers.UvicornWorker -w 1 -b ":${API_PORT}" backend.main:APP --limit-request-line 0
+    depends_on:
+      - migrations
+    networks:
+      - metrics
+
+  frontend:
+    container_name: metrics_frontend
+    restart: always
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    env_file:
+      - .env-dev
+    environment:
+      API_URL: http://metrics_api:${API_PORT}${API_PREFIX}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    command: streamlit run frontend/main.py --server.port ${FRONTEND_PORT} --server.baseUrlPath=${FRONTEND_PREFIX}
+    depends_on:
+      - api
+    networks:
+      - metrics
+
+networks:
+  metrics:
+    driver: bridge
