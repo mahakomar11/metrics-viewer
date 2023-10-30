@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}-frontend
+  name: {{ .Release.Name }}-frontend
+spec:
+  replicas: {{ .Values.frontend.replicaCounts }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-frontend
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ .Release.Name }}-frontend
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-frontend
+          image: "{{ .Values.frontend.image.registry }}/{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+          env:
+            - name: API_URL
+              value: "http://{{ .Release.Name }}-api:{{ .Values.api.port }}{{ .Values.api.prefix }}"
+          args:
+            - streamlit
+            - run
+            - frontend/main.py
+            - --server.port={{ .Values.frontend.port }}
+            - --server.baseUrlPath={{ .Values.frontend.prefix }}
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+          imagePullPolicy: Always
+      restartPolicy: Always

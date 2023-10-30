@@ -1,0 +1,14 @@
+{{ if not .Values.postgres.use_external }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Release.Name }}-db-postgres
+  name: {{ .Release.Name }}-db-postgres
+spec:
+  ports:
+    - port: {{ .Values.postgres.port }}
+      targetPort: {{ .Values.postgres.port }}
+  selector:
+    app: {{ .Release.Name }}-db-postgres
+{{ end }}

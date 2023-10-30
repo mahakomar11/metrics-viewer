@@ -13,7 +13,7 @@ APP = FastAPI(
     openapi_url=config.api_prefix + "/openapi.json",
 )
 
-APP.include_router(aggregation_router, prefix="/aggregation")
+APP.include_router(aggregation_router, prefix=config.api_prefix + "/aggregation")
 
 
 if __name__ == "__main__":

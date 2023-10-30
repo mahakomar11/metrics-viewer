@@ -3,8 +3,11 @@ version: "3.7"
 services:
   database:
     container_name: metrics_database
-    image: postgres:11
+    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_postgres
     restart: always
+    build:
+      context: .
+      dockerfile: postgres/Dockerfile
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,12 +17,11 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - metrics
-    volumes:
-      - ./raw_data:/raw_data
     command: postgres -p ${POSTGRES_PORT} -c 'shared_buffers=128MB' -c 'max_connections=200'
 
   migrations:
     container_name: metrics_migrations
+    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_migrations
     restart: on-failure:3
     build:
       context: .
@@ -36,6 +38,7 @@ services:
 
   api:
     container_name: metrics_api
+    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_api
     restart: always
     build:
       context: .
@@ -54,6 +57,7 @@ services:
 
   frontend:
     container_name: metrics_frontend
+    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_frontend
     restart: always
     build:
       context: .

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-env
+  namespace: {{ .Release.Namespace }}
+data:
+  API_PREFIX: "{{ .Values.api.prefix }}"
+  {{ if .Values.postgres.use_external}}
+  POSTGRES_HOST: {{ .Values.postgres.host }}
+  {{ else }}
+  POSTGRES_HOST: {{ .Release.Name }}-db-postgres
+  PGDATA: {{ .Values.postgres.pg_data }}
+  {{ end }}
+  POSTGRES_PORT: "{{ .Values.postgres.port }}"

@@ -51,3 +51,4 @@ Thumbs.db
 
 .venv*
 data
+/kube-secret.yml

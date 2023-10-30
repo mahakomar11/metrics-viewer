@@ -14,10 +14,7 @@ class Config(BaseSettings):
     postgres_host: str
     postgres_port: str
 
-    admin_editable: bool = False
-
     api_prefix: str
-    admin_prefix: str
 
     class Config:
         extra = Extra.ignore

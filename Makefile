@@ -77,6 +77,15 @@ dev-compose-up:
 dev-compose-down:
 	docker-compose --env-file $(DEV_ENV_FILE) -f $(DEV_COMPOSE_FILE) down
 
+dev-compose-push: dev-compose-up
+	docker-compose --env-file $(DEV_ENV_FILE) -f $(DEV_COMPOSE_FILE) push
+
+helm-install:
+	helm install -f helm/values.yaml metrics helm --namespace metrics
+
+helm-upgrade:
+	helm upgrade -f helm/values.yaml metrics helm --namespace metrics
+
 ############### DATABASE ###############
 
 include ${DEV_ENV_FILE}

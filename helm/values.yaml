@@ -1,0 +1,40 @@
+docker_registry: &registry 563794107255.dkr.ecr.eu-north-1.amazonaws.com  # Registry for components
+
+secrets:
+  secret_name: metrics-secret
+
+api:
+  image:
+    registry: *registry
+    repository: metrics_api
+    tag: latest
+  port: 8001
+  prefix: /api
+  replicaCounts: 2
+  workers_count: 1
+
+migrations:
+  image:
+    registry: *registry
+    repository: metrics_migrations
+    tag: latest
+
+postgres:
+  use_external: false
+  host: ""  # Ignored, if use_external: false
+  image:  # Ignored, if use_external: true
+    registry: *registry
+    repository: metrics_postgres
+    tag: latest
+  port: 5432
+  pg_data: /var/lib/postgresql/data/pgdata  # Ignored, if use_external: true
+  shared_buffer: 128MB
+  max_connections: 200
+
+frontend:
+  image:
+    registry: *registry
+    repository: metrics_frontend
+    tag: latest
+  port: 8501
+  prefix:

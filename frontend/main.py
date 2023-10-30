@@ -33,6 +33,8 @@ def get_aggregation_by_site(event_type: str) -> pd.DataFrame:
     return pd.DataFrame(data["data"]).set_index("site_id")
 
 
+st.set_page_config("Metrics")
+
 st.markdown("# Analytics of CTR and EvPM")
 
 st.markdown("## Aggregation by DMA")
