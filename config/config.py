@@ -15,6 +15,7 @@ class Config(BaseSettings):
     postgres_port: str
 
     api_prefix: str
+    api_key: str
 
     class Config:
         extra = Extra.ignore

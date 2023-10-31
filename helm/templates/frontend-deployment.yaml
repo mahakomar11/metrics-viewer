@@ -24,6 +24,11 @@ spec:
           env:
             - name: API_URL
               value: "http://{{ .Release.Name }}-api:{{ .Values.api.port }}{{ .Values.api.prefix }}"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: API_KEY
+                  name: {{ .Values.secrets.secret_name }}
           args:
             - streamlit
             - run

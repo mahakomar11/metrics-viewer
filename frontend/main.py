@@ -4,8 +4,6 @@ import pandas as pd
 import requests
 import streamlit as st
 
-event_types = ["fclick", "registration", "content", "lead", "signup", "misc"]
-
 base_url = os.getenv("API_URL")
 
 if not base_url:
@@ -16,10 +14,21 @@ if not base_url:
 
 aggregation_url = f"{base_url}/aggregation"
 
+HEADERS = {"Api-Key": os.getenv("API_KEY")}
+
+
+@st.cache_data
+def get_event_types() -> list[str]:
+    res = requests.get(f"{base_url}/event-types", headers=HEADERS)
+    res.raise_for_status()
+    return res.json()["event_types"]
+
 
 @st.cache_data
 def get_aggregation_by_dma(event_type: str) -> pd.DataFrame:
-    res = requests.get(f"{aggregation_url}/dma", params={"event_type": event_type})
+    res = requests.get(
+        f"{aggregation_url}/dma", params={"event_type": event_type}, headers=HEADERS
+    )
     res.raise_for_status()
     data = res.json()
     return pd.DataFrame(data["data"]).set_index("mm_dma")
@@ -27,13 +36,17 @@ def get_aggregation_by_dma(event_type: str) -> pd.DataFrame:
 
 @st.cache_data
 def get_aggregation_by_site(event_type: str) -> pd.DataFrame:
-    res = requests.get(f"{aggregation_url}/site", params={"event_type": event_type})
+    res = requests.get(
+        f"{aggregation_url}/site", params={"event_type": event_type}, headers=HEADERS
+    )
     res.raise_for_status()
     data = res.json()
     return pd.DataFrame(data["data"]).set_index("site_id")
 
 
 st.set_page_config("Metrics")
+
+event_types = get_event_types()
 
 st.markdown("# Analytics of CTR and EvPM")
 

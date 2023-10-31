@@ -12,6 +12,8 @@ DEV_COMPOSE_FILE := docker-compose.dev.yml
 
 ALEMBIC_CONFIG := alembic.ini
 
+NAMESPACE := metrics
+
 ############### INSTALL ###############
 
 install-deps-dev:
@@ -71,6 +73,9 @@ check-lint:
 run-frontend:
 	$(VENV_PYTHON) -m streamlit run frontend/main.py
 
+run-backend:
+	$(VENV_PYTHON) -m backend.main
+
 dev-compose-up:
 	docker-compose --env-file $(DEV_ENV_FILE) -f $(DEV_COMPOSE_FILE) up -d --build
 
@@ -81,10 +86,13 @@ dev-compose-push: dev-compose-up
 	docker-compose --env-file $(DEV_ENV_FILE) -f $(DEV_COMPOSE_FILE) push
 
 helm-install:
-	helm install -f helm/values.yaml metrics helm --namespace metrics
+	helm install -f helm/values.yaml metrics helm --namespace ${NAMESPACE}
+
+helm-uninstall:
+	helm uninstall metrics --namespace ${NAMESPACE}
 
 helm-upgrade:
-	helm upgrade -f helm/values.yaml metrics helm --namespace metrics
+	helm upgrade -f helm/values.yaml metrics helm --namespace ${NAMESPACE}
 
 ############### DATABASE ###############
 
