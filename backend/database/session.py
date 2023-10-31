@@ -1,20 +1,20 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
 from config import Config
 
 
-def get_session(config: Config) -> Session:
-    engine = create_engine(
-        config.postgres_url,
+async def get_session(config: Config) -> AsyncSession:
+    engine = create_async_engine(
+        config.async_postgres_url,
         pool_size=30,
         max_overflow=0,
         pool_pre_ping=True,  # liveness upon each checkout
     )
 
-    with Session(engine) as session:
+    session_maker = async_sessionmaker(engine)
+    async with session_maker() as session:
         try:
             yield session
-            session.commit()
+            await session.commit()
         finally:
-            session.rollback()
+            await session.rollback()

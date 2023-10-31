@@ -1,7 +1,8 @@
 import abc
 
-from sqlalchemy import Numeric, cast, func
-from sqlalchemy.orm import Query, Session
+from sqlalchemy import Numeric, cast, func, select
+from sqlalchemy.orm import Query
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import Subquery
 
 from backend.database.models import Event, Impression
@@ -10,22 +11,22 @@ from backend.schemas.enums import AggregationField, EventType
 
 
 class AggregationRepository(abc.ABC):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._session = session
 
     @abc.abstractmethod
-    def get_all(
+    async def get_all(
         self, event_type: EventType, decimal_places: int = 2
     ) -> list[AggregationRecord]:
         pass
 
     @abc.abstractmethod
-    def get_page(
+    async def get_page(
         self, event_type: EventType, size: int, offset: int, decimal_places: int = 2
     ) -> list[AggregationRecord]:
         pass
 
-    def _get_by_field(
+    async def _get_by_field(
         self,
         field: AggregationField,
         event_type: EventType,
@@ -38,6 +39,8 @@ class AggregationRepository(abc.ABC):
             query = query.limit(size)
         if offset is not None:
             query = query.offset(offset)
+
+        result = await self._session.execute(query)
         return (
             field,
             "impressions_count",
@@ -45,7 +48,7 @@ class AggregationRepository(abc.ABC):
             "events_count",
             "ctr",
             "evpm",
-        ), query.all()
+        ), result.all()
 
     def _query_aggregation(
         self, field: AggregationField, event_type: EventType, decimal_places: int
@@ -55,7 +58,7 @@ class AggregationRepository(abc.ABC):
         subquery_events = self._subquery_events(field, event_type)
 
         return (
-            self._session.query(
+            select(
                 getattr(subquery_impressions.c, field),
                 subquery_impressions.c.impressions_count,
                 func.coalesce(subquery_clicks.c.clicks_count, 0),
@@ -82,9 +85,10 @@ class AggregationRepository(abc.ABC):
             .order_by(getattr(subquery_impressions.c, field))
         )
 
-    def _subquery_impressions(self, field: AggregationField) -> Subquery:
+    @staticmethod
+    def _subquery_impressions(field: AggregationField) -> Subquery:
         return (
-            self._session.query(
+            select(
                 getattr(Impression, field),
                 func.count(Impression.uuid).label("impressions_count"),
             )
@@ -92,11 +96,12 @@ class AggregationRepository(abc.ABC):
             .subquery()
         )
 
+    @staticmethod
     def _subquery_clicks(
-        self, field: AggregationField, event_type: EventType
+        field: AggregationField, event_type: EventType
     ) -> Subquery:
         return (
-            self._session.query(
+            select(
                 getattr(Impression, field), func.count(Event.id).label("clicks_count")
             )
             .filter(Event.tag == event_type)
@@ -105,11 +110,12 @@ class AggregationRepository(abc.ABC):
             .subquery()
         )
 
+    @staticmethod
     def _subquery_events(
-        self, field: AggregationField, event_type: EventType
+        field: AggregationField, event_type: EventType
     ) -> Subquery:
         return (
-            self._session.query(
+            select(
                 getattr(Impression, field), func.count(Event.id).label("events_count")
             )
             .filter(Event.tag.in_([event_type, f"v{event_type}"]))

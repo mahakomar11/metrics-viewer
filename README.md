@@ -37,7 +37,7 @@ To shut down the application, execute:
 make dev-compose-down
 ```
 
-To debug parts of application, a script should be run from metrics-viewer directory, environmental variables will be loaded from [.env-dev file](.env-dev). Workarounds for this:
+To debug parts of application, a script should be run from [root directory](.), environmental variables will be loaded from [.env-dev file](.env-dev). Workarounds for this:
 ```commandline
 make run-frontend
 ```
@@ -67,9 +67,27 @@ make db-migrate
 Prerequisites:
 * k8s cluster
 * namespace ("metrics" by default, can be changed in [Makefile](Makefile))
-* installed helm
+* installed kubectl and helm
 
-To push images to registry (change registry in [docker-compose.dev.yml](docker-compose.dev.yml)):
+Create k8s Secret `kube-secret.yml`:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: metrics-secret
+  namespace: metrics
+stringData:
+  POSTGRES_USER: 
+  POSTGRES_PASSWORD: 
+  POSTGRES_NAME: 
+  API_KEY: 
+```
+Apply it:
+```commandline
+kubectl apply -f kube-secret.yml
+```
+
+Push images to registry (change DOCKER_REGISTRY in [.env-dev](.env-dev)):
 ```commandline
 make dev-compose-push
 ```
@@ -89,5 +107,6 @@ make helm-uninstall
 - [ ] CI/CD for deploying, automatic tests and linters
 - [ ] Logging
 - [ ] Monitoring
+- [ ] Move to external DB
 - [ ] Prepare raw data automatically
 - [ ] Consider different DB

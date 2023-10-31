@@ -4,10 +4,10 @@ from backend.schemas.enums import AggregationField, EventType
 
 
 class SiteAggregationAccess(AggregationRepository):
-    def get_all(
+    async def get_all(
         self, event_type: EventType, decimal_places: int = 2
     ) -> list[SiteAggregationRecord]:
-        field_names, rows = self._get_by_field(
+        field_names, rows = await self._get_by_field(
             field=AggregationField.site,
             event_type=event_type,
             decimal_places=decimal_places,
@@ -17,10 +17,10 @@ class SiteAggregationAccess(AggregationRepository):
             for row in rows
         ]
 
-    def get_page(
+    async def get_page(
         self, event_type: EventType, size: int, offset: int, decimal_places: int = 2
     ) -> list[SiteAggregationRecord]:
-        field_names, rows = self._get_by_field(
+        field_names, rows = await self._get_by_field(
             field=AggregationField.site,
             event_type=event_type,
             decimal_places=decimal_places,

@@ -3,7 +3,7 @@ version: "3.7"
 services:
   database:
     container_name: metrics_database
-    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_postgres
+    image: ${DOCKER_REGISTRY}/metrics_postgres
     restart: always
     build:
       context: .
@@ -21,7 +21,7 @@ services:
 
   migrations:
     container_name: metrics_migrations
-    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_migrations
+    image: ${DOCKER_REGISTRY}/metrics_migrations
     restart: on-failure:3
     build:
       context: .
@@ -38,7 +38,7 @@ services:
 
   api:
     container_name: metrics_api
-    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_api
+    image: ${DOCKER_REGISTRY}/metrics_api
     restart: always
     build:
       context: .
@@ -57,7 +57,7 @@ services:
 
   frontend:
     container_name: metrics_frontend
-    image: 563794107255.dkr.ecr.eu-north-1.amazonaws.com/metrics_frontend
+    image: ${DOCKER_REGISTRY}/metrics_frontend
     restart: always
     build:
       context: .

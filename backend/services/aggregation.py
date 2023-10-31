@@ -7,12 +7,12 @@ class AggregationService:
     def __init__(self, aggregation_repository: AggregationRepository):
         self.aggregation_repository = aggregation_repository
 
-    def get_all(self, event_type: EventType) -> list[AggregationRecord]:
-        return self.aggregation_repository.get_all(event_type)
+    async def get_all(self, event_type: EventType) -> list[AggregationRecord]:
+        return await self.aggregation_repository.get_all(event_type)
 
-    def get_page(
+    async def get_page(
         self, event_type: EventType, size: int, offset: int
     ) -> list[AggregationRecord]:
-        return self.aggregation_repository.get_page(
+        return await self.aggregation_repository.get_page(
             event_type, size=size, offset=offset
         )

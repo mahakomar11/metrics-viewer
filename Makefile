@@ -24,7 +24,7 @@ install-deps-dev:
 install-deps:
 	@echo -e "Install dependencies for frontend\n"
 	$(VENV_PYTHON) -m pip install \
-		-Ur ./requirements.txt
+		-Ur ./frontend/requirements.txt
 
 	@echo -e "Install dependencies for backend\n"
 	$(VENV_PYTHON) -m pip install \

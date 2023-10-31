@@ -9,15 +9,15 @@ from backend.services.aggregation import AggregationService
 from config import Config, get_config
 
 
-def get_site_aggregation_service(
+async def get_site_aggregation_service(
     config: Config = Depends(get_config),
 ) -> AggregationService:
-    for session in get_session(config):
+    async for session in get_session(config):
         yield AggregationService(SiteAggregationAccess(session))
 
 
-def get_dma_aggregation_service(
+async def get_dma_aggregation_service(
     config: Config = Depends(get_config),
 ) -> AggregationService:
-    for session in get_session(config):
+    async for session in get_session(config):
         yield AggregationService(DmaAggregationAccess(session))
