@@ -13,3 +13,4 @@ class EventType(StrEnum):
 class AggregationField(StrEnum):
     site = "site_id"
     dma = "mm_dma"
+    reg_interval = "reg_interval"

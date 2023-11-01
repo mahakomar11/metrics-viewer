@@ -3,5 +3,6 @@ from backend.schemas.responses import (
     AuthErrorResponse,
     GetAggregationByDmaResponse,
     GetAggregationBySiteResponse,
+    GetAggregationByTimeResponse,
     GetEventTypesResponse,
 )

@@ -1,3 +1,3 @@
-FROM postgres:11
+FROM postgres:14
 
 COPY raw_data/ /raw_data
