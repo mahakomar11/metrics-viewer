@@ -1,8 +1,8 @@
 import abc
 
 from sqlalchemy import Numeric, cast, func, select
-from sqlalchemy.orm import Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Query
 from sqlalchemy.sql.expression import Subquery
 
 from backend.database.models import Event, Impression
@@ -97,9 +97,7 @@ class AggregationRepository(abc.ABC):
         )
 
     @staticmethod
-    def _subquery_clicks(
-        field: AggregationField, event_type: EventType
-    ) -> Subquery:
+    def _subquery_clicks(field: AggregationField, event_type: EventType) -> Subquery:
         return (
             select(
                 getattr(Impression, field), func.count(Event.id).label("clicks_count")
@@ -111,9 +109,7 @@ class AggregationRepository(abc.ABC):
         )
 
     @staticmethod
-    def _subquery_events(
-        field: AggregationField, event_type: EventType
-    ) -> Subquery:
+    def _subquery_events(field: AggregationField, event_type: EventType) -> Subquery:
         return (
             select(
                 getattr(Impression, field), func.count(Event.id).label("events_count")

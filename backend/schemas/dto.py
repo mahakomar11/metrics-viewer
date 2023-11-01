@@ -1,4 +1,5 @@
 import abc
+import datetime
 
 from pydantic import BaseModel
 
@@ -17,3 +18,7 @@ class SiteAggregationRecord(AggregationRecord):
 
 class DmaAggregationRecord(AggregationRecord):
     mm_dma: int
+
+
+class TimeAggregationRecord(AggregationRecord):
+    reg_interval: datetime.datetime
